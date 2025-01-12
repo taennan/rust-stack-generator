@@ -1,0 +1,25 @@
+meta {
+  name: getMany
+  type: graphql
+  seq: 4
+}
+
+post {
+  url: {{coreGQLUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query {
+    getManyReserveeUsers(input: { 
+    	conditions: {},
+      pagination: { page: 0, take: 10 },
+    }) {
+      id
+      created
+      updated
+    }
+  }
+  
+}

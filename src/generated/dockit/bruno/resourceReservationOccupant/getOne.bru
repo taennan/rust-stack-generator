@@ -1,0 +1,22 @@
+meta {
+  name: getOne
+  type: graphql
+  seq: 5
+}
+
+post {
+  url: {{coreGQLUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query {
+    getOneResourceReservationOccupant(input: {}) {
+      id
+      created
+      updated
+    }
+  }
+  
+}

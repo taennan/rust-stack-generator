@@ -1,0 +1,82 @@
+name: SmartSite
+language: Rust
+entities:
+  - name: AdminApiKey
+    fields:
+      id: Uuid
+      hash: String
+      created: NaiveDateTime
+  - name: Org
+    fields:
+      id: Uuid
+      name: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: OrgUser
+    fields:
+      id: Uuid
+      org_id: Uuid
+      auth_id: Uuid
+      name: String
+      email: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: PublicUser
+    fields:
+      id: Uuid
+      auth_id: Uuid
+      email: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Post
+    fields:
+      id: Uuid
+      author_id: Uuid
+      org_id: Uuid
+      title: String
+      subtitle: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: PostContent
+    fields:
+      id: Uuid
+      org_id: Uuid
+      media_id: Option<Uuid>
+      content: String
+      index: u32
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: PostComment
+    fields:
+      id: Uuid
+      post_id: Uuid
+      comment_id: Uuid
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Media
+    fields:
+      id: Uuid
+      org_id: Uuid
+      title: String
+      # MediaType { IMAGE, VIDEO, AUDIO }
+      type: String
+      filename: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Comment
+    fields:
+      id: Uuid
+      parent_id: Option<Uuid>
+      public_user_id: Uuid
+      content: String
+      upvotes: u32
+      downvotes: u32
+      # CommentStatus { DRAFT, PENDING, ACTIVE, DELETED }
+      status: String
+      # Will use this field as order indexer
+      created: NaiveDateTime
+      updated: NaiveDateTime

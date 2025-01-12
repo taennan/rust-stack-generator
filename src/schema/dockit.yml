@@ -1,0 +1,90 @@
+name: Dockit
+language: Rust
+endpoints:
+  - GraphQL
+  - Rest
+entities:
+  - name: AdminApiKey
+    fields:
+      id: Uuid
+      hash: String
+      created: NaiveDateTime
+  - name: Occupant
+    fields:
+      id: Uuid
+      org_id: Uuid
+      name: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Org
+    fields:
+      id: Uuid
+      name: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: OrgUser
+    fields:
+      id: Uuid
+      org_id: Uuid
+      claw_auth_id: Uuid
+      email: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Reservation
+    fields:
+      id: Uuid
+      org_id: Uuid
+      reservee_id: Uuid
+      status: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Reservee
+    fields:
+      id: Uuid
+      org_id: Uuid
+      reservee_user_id: Option<Uuid>
+      first_name: Option<String>
+      middle_names: Option<String>
+      last_name: Option<String>
+      email: Option<String>
+      phone: Option<String>
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: ReserveeUser
+    fields:
+      id: Uuid
+      claw_auth_id: Uuid
+      email: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Resource
+    fields:
+      id: Uuid
+      org_id: Uuid
+      name: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: ResourceReservation
+    fields:
+      id: Uuid
+      org_id: Uuid
+      resource_id: Uuid
+      reservation_id: Uuid
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: ResourceReservationOccupant
+    fields:
+      id: Uuid
+      org_id: Uuid
+      resource_reservation_id: Uuid
+      occupant_id: Uuid
+      created: NaiveDateTime
+      updated: NaiveDateTime

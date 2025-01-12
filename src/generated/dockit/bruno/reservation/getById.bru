@@ -1,0 +1,26 @@
+meta {
+  name: getById
+  type: graphql
+  seq: 3
+}
+
+post {
+  url: {{coreGQLUrl}}
+  body: graphql
+  auth: inherit
+}
+
+body:graphql {
+  query {
+    getReservationById(id: "{{id}}") {
+      id
+      created
+      updated
+    }
+  }
+  
+}
+
+vars:pre-request {
+  id: 
+}

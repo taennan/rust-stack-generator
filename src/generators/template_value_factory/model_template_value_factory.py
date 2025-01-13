@@ -1,6 +1,7 @@
 from generators.template_value_factory.template_key_val_pair import TemplateKeyValPair
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
 from generators.template_value_factory.entity_name_template_value_factory import EntityNameTemplateValueFactory
+from generators.schema.global_schema import GlobalSchema
 from generators.schema.entity_schema import EntitySchema, EntityField
 from constants.rust_types import RustTypes
 from caseconverter import camelcase
@@ -8,13 +9,14 @@ from typing import Callable
 
 class ModelTemplateValueFactory(TemplateValueFactory):
 
-    def __init__(self, entity_schema: EntitySchema, camelize_fields: bool=False, ignored_fields: list[str] = []):
+    def __init__(self, global_schema: GlobalSchema, entity_schema: EntitySchema, camelize_fields: bool=False, ignored_fields: list[str] = []):
+        self._global_schema = global_schema
         self._entity_schema = entity_schema
         self._camelize_fields = camelize_fields
         self._ignored_fields = ignored_fields
 
     def keyvals(self) -> list[TemplateKeyValPair]:
-        entity_name_factory = EntityNameTemplateValueFactory(self._entity_schema.name())
+        entity_name_factory = EntityNameTemplateValueFactory(self._global_schema, self._entity_schema.name())
         return [
             self._model_fields(),
             self._create_input_fields(),

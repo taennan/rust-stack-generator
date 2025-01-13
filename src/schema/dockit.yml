@@ -1,8 +1,4 @@
-name: Dockit
-language: Rust
-endpoints:
-  - GraphQL
-  - Rest
+project: Dockit
 entities:
   - name: AdminApiKey
     fields:

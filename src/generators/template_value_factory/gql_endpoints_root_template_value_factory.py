@@ -1,8 +1,7 @@
-from generators.schema.entity_schema import EntitySchema
 from generators.schema.global_schema import GlobalSchema
 from generators.template_value_factory.template_key_val_pair import TemplateKeyValPair
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
-from generators.template_value_factory.entity_name_template_value_factory import EntityNameTemplateValueFactory
+from generators.template_value_factory.global_template_value_factory import GlobalTemplateValueFactory
 
 class GQLEndpointsRootTemplateValueFactory(TemplateValueFactory):
 
@@ -11,6 +10,7 @@ class GQLEndpointsRootTemplateValueFactory(TemplateValueFactory):
 
     def keyvals(self) -> list[TemplateKeyValPair]:
         return [
+            *GlobalTemplateValueFactory(self._global_schema).keyvals(),
             TemplateKeyValPair("object_imports", self._generate_object_imports()),
             TemplateKeyValPair("queries", self._generate_objects("Query")),
             TemplateKeyValPair("mutations", self._generate_objects("Mutation")),
@@ -22,7 +22,7 @@ class GQLEndpointsRootTemplateValueFactory(TemplateValueFactory):
         for entity_schema in self._global_schema.entities():
             query_import = f"{entity_schema.name()}Queries"
             mutation_import = f"{entity_schema.name()}Mutations"
-            imports += f"\n\t{entity_schema.name_snakecase()}::{'{'}{query_import}, {mutation_import}{'}'},"
+            imports += f"\n\t{entity_schema.name_lower()}::{'{'}{query_import}, {mutation_import}{'}'},"
 
         return imports
     

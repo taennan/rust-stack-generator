@@ -1,4 +1,5 @@
 from generators.schema.entity_schema import EntitySchema
+from generators.schema.global_schema import GlobalSchema
 from generators.template_value_factory.template_key_val_pair import TemplateKeyValPair
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
 from generators.template_value_factory.entity_name_template_value_factory import EntityNameTemplateValueFactory
@@ -6,24 +7,31 @@ from generators.template_value_factory.entity_name_template_value_factory import
 class ModelConverterTemplateValueFactory(TemplateValueFactory):
 
     @classmethod
-    def db_model_converter(cls, entity_schema: EntitySchema):
-        return ModelConverterTemplateValueFactory(entity_schema)
+    def db_model_converter(cls, global_schema: GlobalSchema, entity_schema: EntitySchema):
+        return ModelConverterTemplateValueFactory(global_schema, entity_schema)
     
     @classmethod
-    def service_model_converter(cls, entity_schema: EntitySchema):
-        return ModelConverterTemplateValueFactory(entity_schema, ignored_fields=["org_id"])
+    def service_model_converter(cls, global_schema: GlobalSchema, entity_schema: EntitySchema):
+        return ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"])
     
     @classmethod
-    def service_input_converter(cls, entity_schema: EntitySchema):
-        return ModelConverterTemplateValueFactory(entity_schema, ignored_fields=["org_id"], object_accessor="converter.input")
+    def service_input_converter(cls, global_schema: GlobalSchema, entity_schema: EntitySchema):
+        return ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"], object_accessor="converter.input")
 
-    def __init__(self, entity_schema: EntitySchema, ignored_fields: list[str] = [], object_accessor = "model"):
+    def __init__(
+            self, 
+            global_schema: GlobalSchema, 
+            entity_schema: EntitySchema, 
+            ignored_fields: list[str] = [], 
+            object_accessor = "model"
+        ):
+        self._global_schema = global_schema
         self._entity_schema = entity_schema
         self._ignored_fields = ignored_fields
         self._object_accessor = object_accessor
 
     def keyvals(self) -> list[TemplateKeyValPair]:
-        entity_name_factory = EntityNameTemplateValueFactory(self._entity_schema.name())
+        entity_name_factory = EntityNameTemplateValueFactory(self._global_schema, self._entity_schema.name())
         return [
             TemplateKeyValPair("mapped_fields", self._generate_mapped_fields()),
             *entity_name_factory.keyvals(),

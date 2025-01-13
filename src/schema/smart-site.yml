@@ -1,5 +1,5 @@
-name: SmartSite
-language: Rust
+project: SmartSite
+project_prefix: SS
 entities:
   - name: AdminApiKey
     fields:

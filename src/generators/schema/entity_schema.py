@@ -24,7 +24,7 @@ class EntitySchema:
     def name(self) -> str:
         return self._entity_data["name"]
 
-    def name_snakecase(self) -> str:
+    def name_lower(self) -> str:
         return snakecase(self.name())
 
     def fields(self) -> list[EntityField]:

@@ -1,4 +1,5 @@
 from generators.schema.entity_schema import EntitySchema, EntityField
+from generators.schema.global_schema import GlobalSchema
 from generators.template_value_factory.template_key_val_pair import TemplateKeyValPair
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
 from generators.template_value_factory.entity_name_template_value_factory import EntityNameTemplateValueFactory
@@ -6,11 +7,12 @@ from caseconverter import pascalcase
 
 class DBEntityTemplateValueFactory(TemplateValueFactory):
 
-    def __init__(self, entity_schema: EntitySchema):
+    def __init__(self, global_schema: GlobalSchema, entity_schema: EntitySchema):
         self._entity_schema = entity_schema
+        self._global_schema = global_schema
 
     def keyvals(self) -> list[TemplateKeyValPair]:
-        entity_name_factory = EntityNameTemplateValueFactory(self._entity_schema.name())
+        entity_name_factory = EntityNameTemplateValueFactory(self._global_schema, self._entity_schema.name())
         return [
             TemplateKeyValPair("model_fields", self._generate_model_fields()),
             TemplateKeyValPair("relation_enum", self._generate_relation_enum()),

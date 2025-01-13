@@ -2,6 +2,7 @@ from generators.schema.entity_schema import EntityField, EntitySchema
 from generators.schema.global_schema import GlobalSchema
 from generators.template_value_factory.template_key_val_pair import TemplateKeyValPair
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
+from generators.template_value_factory.global_template_value_factory import GlobalTemplateValueFactory
 from constants.rust_types import RustTypes
 
 class MigrationTemplateValueFactory(TemplateValueFactory):
@@ -11,6 +12,7 @@ class MigrationTemplateValueFactory(TemplateValueFactory):
 
     def keyvals(self) -> list[TemplateKeyValPair]:
         return [
+            *GlobalTemplateValueFactory(self._global_schema).keyvals(),
             TemplateKeyValPair("table_create_calls", self._generate_table_create_calls()),
             TemplateKeyValPair("table_drop_methods", self._generate_table_drop_methods()),
             TemplateKeyValPair("entity_enums", self._generate_entity_enums()),

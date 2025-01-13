@@ -1,15 +1,17 @@
 from generators.schema.entity_schema import EntitySchema
+from generators.schema.global_schema import GlobalSchema
 from generators.template_value_factory.template_key_val_pair import TemplateKeyValPair
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
 from generators.template_value_factory.entity_name_template_value_factory import EntityNameTemplateValueFactory
 
 class DBUpdateInputConverterTemplateValueFactory(TemplateValueFactory):
 
-    def __init__(self, entity_schema: EntitySchema):
+    def __init__(self, global_schema: GlobalSchema, entity_schema: EntitySchema):
         self._entity_schema = entity_schema
+        self._global_schema = global_schema
 
     def keyvals(self) -> list[TemplateKeyValPair]:
-        entity_name_factory = EntityNameTemplateValueFactory(self._entity_schema.name())
+        entity_name_factory = EntityNameTemplateValueFactory(self._global_schema, self._entity_schema.name())
         return [
             TemplateKeyValPair("mapped_fields", self._generate_mapped_fields()),
             *entity_name_factory.keyvals(),

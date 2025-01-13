@@ -1,6 +1,7 @@
 import yaml
 from pathlib import Path
 from generators.schema.entity_schema import EntitySchema
+from caseconverter import pascalcase, snakecase
 
 class GlobalSchema:
 
@@ -13,8 +14,20 @@ class GlobalSchema:
         with open(schema_path, "r") as file:
             return yaml.safe_load(file)
 
-    def schema_name(self) -> str:
-        return self._data["name"]
+    def project(self) -> str:
+        return self._data["project"]
+    
+    def project_lower(self) -> str:
+        return snakecase(self.project())
+    
+    def project_prefix(self) -> str:
+        default = self._data["project_prefix"]
+        if default:
+            return default
+        return pascalcase(self.project())
+    
+    def project_prefix_lower(self) -> str:
+        return self.project_prefix().lower()
 
     def entities(self) -> list[EntitySchema]:
         entities = []

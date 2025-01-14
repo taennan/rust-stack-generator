@@ -13,4 +13,5 @@ class GlobalTemplateValueFactory(TemplateValueFactory):
             TemplateKeyValPair("project_lower", self._global_schema.project_lower()),
             TemplateKeyValPair("project_prefix", self._global_schema.project_prefix()),
             TemplateKeyValPair("project_prefix_lower", self._global_schema.project_prefix_lower()),
+            TemplateKeyValPair("project_kebab", self._global_schema.project_kebab()),
         ]

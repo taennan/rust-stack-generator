@@ -1,0 +1,14 @@
+[package]
+name = "{project_kebab}-db-interface"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = { workspace = true }
+chrono = { workspace = true }
+{project_kebab}-common-models = { path = "../../models/{project_kebab}-common-models" }
+{project_kebab}-error = { path = "../../models/{project_kebab}-error" }
+{project_kebab}-db-models = { path = "../{project_kebab}-db-models" }
+mockall = { workspace = true }
+serde = { workspace = true }
+uuid = { workspace = true }

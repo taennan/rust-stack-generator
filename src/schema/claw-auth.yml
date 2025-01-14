@@ -1,0 +1,153 @@
+project: ClawAuth
+project_prefix: Claw
+entities:
+  - name: Org
+    fields:
+      id: Uuid
+      name: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: OrgSettings
+    fields:
+      id: Uuid
+      org_id: Uuid
+      name: String
+      temp_token_length: u32
+      two_factor_email: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Authee
+    fields:
+      id: Uuid
+      org_id: Uuid
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: PermToken
+    fields:
+      id: Uuid
+      org_id: Uuid
+      authee_id: Uuid
+      hash: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: TempToken
+    fields:
+      id: Uuid
+      org_id: Uuid
+      authee_id: Uuid
+      hash: String
+      expiry: NaiveDateTime
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Contact
+    fields:
+      id: Uuid
+      org_id: Uuid
+      authee_id: Uuid
+      # Enum { EMAIL, PHONE }
+      type: String
+      value: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Action
+    fields:
+      id: Uuid
+      org_id: Uuid
+      name: String
+      # Enum { ACTIVE, DISABLED }
+      status: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: ActionGroup
+    fields:
+      id: Uuid
+      org_id: Uuid
+      name: String
+      # Enum { ACTIVE, DISABLED }
+      status: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: ActionGroupAction
+    fields:
+      id: Uuid
+      org_id: Uuid
+      action_id: Uuid
+      action_group_id: Uuid
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: ActionGroupContext
+    fields:
+      id: Uuid
+      org_id: Uuid
+      context_id: Uuid
+      action_group_id: Uuid
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: Context
+    fields:
+      id: Uuid
+      org_id: Uuid
+      name: String
+      # Enum { ACTIVE, DISABLED }
+      status: String
+      description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: AutheeActionGroup
+    fields:
+      id: Uuid
+      org_id: Uuid
+      action_group_id: Uuid
+      authee_id: Uuid
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: AutheeContext
+    fields:
+      id: Uuid
+      authee_id: Uuid
+      context_id: Uuid
+      start: Option<Time>
+      end: Option<Time>
+      # Enum { DAILY, WEEEKDAYS, WEEKENDS, }
+      timeframe: Option<String>
+      created: NaiveDateTime
+      updated: NaiveDateTime
+
+# DMC-like business example
+
+Contexts:
+  - Fiji
+  - Suva
+  - Nadi
+  - Samoa
+  - Apia
+Actions:
+  - FryChicken
+  - FryChips
+  - OrderChicken
+  - OrderChips
+ActionGroups:
+  - FryFood<T>
+  - ManageStock<T>
+Authees:
+  - name: ChairmanMao
+    action_groups:
+      - ManageStock
+    contexts:
+      - Fiji
+      - Samoa
+  - name: FijiWesternManager
+    action_groups:
+      - ManageStock
+      - FryFood
+    contexts:
+      - Lautoka
+  - name: FryCook
+    action_groups:
+      - FryFood
+    contexts:
+      - Lautoka
+   

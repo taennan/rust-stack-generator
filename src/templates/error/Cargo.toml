@@ -1,0 +1,15 @@
+[package]
+name = "{project_kebab}-error"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+actix_web = ["dep:actix-web"]
+async_graphql = ["dep:async-graphql"]
+sea_orm = ["dep:sea-orm"]
+
+[dependencies]
+actix-web = { workspace = true, optional = true }
+async-graphql = { workspace = true, optional = true }
+sea-orm = { workspace = true, optional = true }
+serde = { workspace = true }

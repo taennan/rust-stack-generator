@@ -6,17 +6,27 @@ entities:
       id: Uuid
       hash: String
       created: NaiveDateTime
-  - name: Org
+  - name: Site
     fields:
       id: Uuid
       name: String
       description: String
       created: NaiveDateTime
       updated: NaiveDateTime
-  - name: OrgUser
+  - name: SiteSettings
     fields:
       id: Uuid
-      org_id: Uuid
+      site_id: Uuid
+      # Enum { DISABLED, ENABLED, LOCKED }
+      comments_status: String
+      # Enum { DISABLED, ENABLED, LOCKED }
+      reviews_status: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: SiteUser
+    fields:
+      id: Uuid
+      site_id: Uuid
       auth_id: Uuid
       name: String
       email: String
@@ -27,15 +37,24 @@ entities:
     fields:
       id: Uuid
       auth_id: Uuid
+      name: String
       email: String
       description: String
+      created: NaiveDateTime
+      updated: NaiveDateTime
+  - name: UserAuth
+    fields:
+      id: Uuid
+      password_hash: String
+      access_token: Option<String>
+      refresh_token: Option<String>
       created: NaiveDateTime
       updated: NaiveDateTime
   - name: Post
     fields:
       id: Uuid
       author_id: Uuid
-      org_id: Uuid
+      site_id: Uuid
       title: String
       subtitle: String
       created: NaiveDateTime
@@ -43,7 +62,7 @@ entities:
   - name: PostContent
     fields:
       id: Uuid
-      org_id: Uuid
+      site_id: Uuid
       media_id: Option<Uuid>
       content: String
       index: u32
@@ -59,7 +78,8 @@ entities:
   - name: Media
     fields:
       id: Uuid
-      org_id: Uuid
+      site_id: Uuid
+      file_id: Uuid
       title: String
       # MediaType { IMAGE, VIDEO, AUDIO }
       type: String
@@ -72,6 +92,7 @@ entities:
       id: Uuid
       parent_id: Option<Uuid>
       public_user_id: Uuid
+      depth: u32
       content: String
       upvotes: u32
       downvotes: u32
@@ -80,3 +101,35 @@ entities:
       # Will use this field as order indexer
       created: NaiveDateTime
       updated: NaiveDateTime
+#  - name: Listing
+#    fields:
+#      id: Uuid
+#      title: String
+#      subtitle: String
+#      description: String
+#      created: NaiveDateTime
+#      updated: NaiveDateTime
+#  - name: ListingMedia
+#    fields:
+#      id: Uuid
+#      listing_id: Uuid
+#      media_id: Uuid
+#      index: u32
+#      created: NaiveDateTime
+#      updated: NaiveDateTime
+#  - name: Review
+#    fields:
+#      id: Uuid
+#      listing_id: Uuid
+#      public_user_id: Uuid
+#      rating: u32
+#      content: String
+#      created: NaiveDateTime
+#      updated: NaiveDateTime
+#  - name: ReviewComment
+#    fields:
+#      id: Uuid
+#      review_id: Uuid
+#      comment_id: Uuid
+#      created: NaiveDateTime
+#      updated: NaiveDateTime

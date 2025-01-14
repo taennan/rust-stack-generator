@@ -1,0 +1,19 @@
+[package]
+name = "{project_kebab}-services"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+async-trait = { workspace = true }
+claw-auth-client = { workspace = true }
+{project_kebab}-db-interface = { path = "../../db/{project_kebab}-db-interface" }
+{project_kebab}-db-models = { path = "../../db/{project_kebab}-db-models" }
+{project_kebab}-common-models = { path = "../../models/{project_kebab}-common-models" }
+{project_kebab}-error = { path = "../../models/{project_kebab}-error" }
+{project_kebab}-services-interface = { path = "../{project_kebab}-services-interface" }
+maybe = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }

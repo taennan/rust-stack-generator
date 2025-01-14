@@ -1,0 +1,46 @@
+[workspace]
+resolver = "2"
+members = [
+    "api/apps/{project_kebab}-admin-app",
+    "api/apps/{project_kebab}-app",
+    "api/apps/{project_kebab}-app-base",
+    "api/endpoints/{project_kebab}-debug-graphql",
+    "api/endpoints/{project_kebab}-debug-rest",
+    "api/endpoints/{project_kebab}-graphql",
+    "db/{project_kebab}-db-interface",
+    "db/{project_kebab}-db-migrations",
+    "db/{project_kebab}-db-models",
+    "db/{project_kebab}-db-postgres",
+    "dev/{project_kebab}-dev-cli",
+    "models/{project_kebab}-common-models",
+    "models/{project_kebab}-error",
+    "services/{project_kebab}-config",
+    "services/{project_kebab}-services",
+    "services/{project_kebab}-services-interface",
+]
+
+[workspace.dependencies]
+actix-web = "4.9.0"
+actix-cors = "0.7.0"
+async-trait = "0.1.83"
+async-graphql = { version = "7.0.13", features = ["chrono", "uuid"] }
+async-graphql-actix-web = "7.0.13"
+clap = { version = "4.5.23", features = ["derive"] }
+clap_derive = { version = "4.5.18" }
+claw-auth-client = { path = "../../Rust/claw-auth/claw-auth-client" }
+chrono = { version = "0.4.39", features = ["now", "serde"] }
+dotenv = "0.15.0"
+env_logger = "0.11.5"
+futures = "0.3.31"
+maybe = { path = "../../Rust/maybe" }
+mockall = "0.13.0"
+tokio = { version = "1.42.0", features = ["rt", "macros"] }
+sea-orm = { version = "1.1.2", features = [
+    "sqlx-postgres",
+    "runtime-actix-native-tls",
+    "macros",
+    "with-chrono",
+] }
+serde = { version = "1.0.216", features = ["derive"] }
+serde_json = "1.0.134"
+uuid = { version = "1.11.0", features = ["v4"] }

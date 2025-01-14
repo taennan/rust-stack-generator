@@ -1,0 +1,22 @@
+[package]
+name = "{project_kebab}-graphql"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = { workspace = true }
+async-graphql = { workspace = true }
+async-graphql-actix-web = { workspace = true }
+{project_kebab}-debug-graphql = { path = "../{project_kebab}-debug-graphql" }
+{project_kebab}-services = { path = "../../../services/{project_kebab}-services" }
+{project_kebab}-services-interface = { path = "../../../services/{project_kebab}-services-interface", features = [
+    "async_graphql",
+] }
+{project_kebab}-db-postgres = { path = "../../../db/{project_kebab}-db-postgres" }
+{project_kebab}-error = { path = "../../../models/{project_kebab}-error", features = [
+    "actix_web",
+    "async_graphql",
+] }
+sea-orm = { workspace = true }
+serde_json = { workspace = true }
+uuid = { workspace = true }

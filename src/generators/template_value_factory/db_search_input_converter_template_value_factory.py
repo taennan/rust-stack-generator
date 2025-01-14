@@ -4,7 +4,7 @@ from generators.template_value_factory.template_key_val_pair import TemplateKeyV
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
 from generators.template_value_factory.entity_name_template_value_factory import EntityNameTemplateValueFactory
 from constants.rust_types import RustTypes
-from caseconverter import pascalcase
+from caseconverter import pascalcase, snakecase
 
 class DBSearchInputConverterTemplateValueFactory(TemplateValueFactory):
 
@@ -24,30 +24,29 @@ class DBSearchInputConverterTemplateValueFactory(TemplateValueFactory):
 
         for field in self._entity_schema.fields():
             field_name = field.field_name()
+            field_method = self._field_converter_method(field.type_name())
 
             if self._is_ignored_field(field_name):
                 continue
 
             field_name_uppercase = pascalcase(field_name)
-            select_filter = self._select_filter_from_field_type(field.type_name())
-            
             value += f"""
-            .apply_if(input.{field_name}, |select, {field_name}| {{
-                let expression = SimpleExpr::from({select_filter}::new(Column::{field_name_uppercase}, {field_name}));
-                select.filter(expression)
-            }})"""
+            .apply_if(input.{field_name}, SearchFieldConverter::new(Column::{field_name_uppercase}).{field_method}())
+            """
 
         return value.rstrip("\n")
 
     def _is_ignored_field(self, field_name: str) -> bool:
         return field_name in ["id", "created", "updated"]
-
-    def _select_filter_from_field_type(self, type_name: str) -> str:
-        if RustTypes.is_ranged_type(type_name):
-            return "SelectRangedFilter"
-        if RustTypes.is_exact_type(type_name):
-            return "SelectExactFilter"
-        if RustTypes.is_iterable_type(type_name):
-            return "SelectIterableFilter"
+    
+    def _field_converter_method(self, type_name: str) -> str:
+        if RustTypes.is_type_or_optional(type_name, RustTypes.STRING):
+            return "string"
+        if RustTypes.is_number_type(type_name):
+            return "int"
+        if RustTypes.is_type_or_optional(type_name, RustTypes.UUID):
+            return "id"
+        if RustTypes.is_time_type(type_name):
+            return "date_time"
         
         raise Exception(f"Unknown field type '{type_name}' for entity '{self._entity_schema.name()}'")

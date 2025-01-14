@@ -3,6 +3,6 @@ pub(crate) mod client_impl;
 pub(crate) mod client_tests;
 #[cfg(not(feature = "mock"))]
 pub mod database_connector;
-pub(crate) mod maybe_converter;
+pub(crate) mod search_field_converter;
 
-pub(crate) use maybe_converter::MaybeConverter;
+pub(crate) use search_field_converter::SearchFieldConverter;

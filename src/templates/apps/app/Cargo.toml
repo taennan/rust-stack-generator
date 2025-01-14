@@ -1,0 +1,10 @@
+[package]
+name = "{project_kebab}"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+actix-web = { workspace = true }
+{project_kebab}-app-base = { path = "../{project_kebab}-app-base", features = [
+    # Add features here
+] }

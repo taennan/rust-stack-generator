@@ -1,0 +1,16 @@
+[package]
+name = "{project_kebab}-app-base"
+version = "0.1.0"
+edition = "2021"
+
+[features]
+{project_lower}_admin_graphql = []
+{project_lower}_graphql = ["dep:{project_kebab}-graphql"]
+
+[dependencies]
+actix-web = { workspace = true }
+actix-cors = { workspace = true }
+{project_kebab}-config = { path = "../../../services/{project_kebab}-config" }
+{project_kebab}-graphql = { path = "../../endpoints/{project_kebab}-graphql", optional = true }
+dotenv = { workspace = true }
+env_logger = { workspace = true }

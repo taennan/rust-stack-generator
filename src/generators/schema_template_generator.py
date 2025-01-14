@@ -2,6 +2,7 @@ import shutil
 from pathlib import Path
 from generators.schema.entity_schema import EntitySchema
 from generators.file_generator.file_template_generator import FileTemplateGenerator
+from generators.template_value_factory.entity_modules_template_value_factory import EntityModulesTemplateValueFactory
 from generators.template_value_factory.global_template_value_factory import GlobalTemplateValueFactory
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
 from generators.template_value_factory.entity_name_template_value_factory import EntityNameTemplateValueFactory
@@ -30,7 +31,16 @@ class SchemaTemplateGenerator:
         self._schema_filename = schema_filename
 
     def make_files(self):
+        global_schema = GlobalSchema(self._schema_filename)
+        global_value_factory = GlobalTemplateValueFactory(global_schema)
+
         self._make_outdir()
+
+        self._mkdir(self._outdir() / "apps")
+        admin_app_crate = self._make_crate("apps/admin")
+        core_app_crate = self._make_crate("apps/core")
+        app_base_crate = self._make_crate("apps/base")
+
         error_crate = self._make_crate("error")
         migration_dir = self._mkdir(self._outdir() / "migration")
 
@@ -41,7 +51,7 @@ class SchemaTemplateGenerator:
         common_models_crate = self._make_crate("common_models")
 
         db_interface_crate = self._make_crate("db_interface")
-        db_models_crate = self._make_crate("db_models")
+        #db_models_crate = self._make_crate("db_models")
         db_impl_crate = self._make_crate("db_impl")
         db_utils_dir = self._mkdir(db_impl_crate.src / "utils")
         db_test_utils_dir = self._mkdir(db_utils_dir / "client_tests")
@@ -49,12 +59,10 @@ class SchemaTemplateGenerator:
         service_interface_crate = self._make_crate("service_interface")
         service_impl_crate = self._make_crate("service_impl")
 
-        global_schema = GlobalSchema(self._schema_filename)
-        global_value_factory = GlobalTemplateValueFactory(global_schema)
-
         for entity_schema in global_schema.entities():
             entity_filename = f"{entity_schema.name_lower()}.rs"
 
+            entity_db_interface_dir = self._mkdir(db_interface_crate.src / entity_schema.name_lower())
             entity_db_dir = self._mkdir(db_impl_crate.src / entity_schema.name_lower())
             entity_db_utils_dir = self._mkdir(entity_db_dir / "utils")
             
@@ -73,10 +81,9 @@ class SchemaTemplateGenerator:
 
             self._gen_file("gql/src/schema/endpoint.rs", gql_endpoints_dir / entity_filename, entity_name_template_value_factory)
 
-            self._gen_file("db/interface/src/trait.rs", db_interface_crate.src / entity_filename, entity_name_template_value_factory)
-            self._gen_rust_file("db/interface/src/mod", db_interface_crate.src, entity_name_template_value_factory)
-
-            self._gen_file("db/interface/src/models.rs", db_models_crate.src / entity_filename, entity_name_template_value_factory)
+            self._gen_rust_file("db/interface/src/database", entity_db_interface_dir, entity_name_template_value_factory)
+            self._gen_rust_file("db/interface/src/models", entity_db_interface_dir, entity_name_template_value_factory)
+            self._gen_rust_file("db/interface/src/mod", entity_db_interface_dir, entity_name_template_value_factory)
 
             self._gen_rust_file("db/impl/src/database", entity_db_dir, entity_name_template_value_factory)
             self._gen_rust_file("db/impl/src/entity", entity_db_dir, DBEntityTemplateValueFactory(global_schema, entity_schema))
@@ -91,7 +98,7 @@ class SchemaTemplateGenerator:
 
             self._gen_rust_file("service/interface/src/mod", entity_service_interface_dir, entity_name_template_value_factory)
             self._gen_rust_file("service/interface/src/models", entity_service_interface_dir, entity_name_template_value_factory)
-            self._gen_rust_file("service/interface/src/trait", entity_service_interface_dir, entity_name_template_value_factory)
+            self._gen_rust_file("service/interface/src/service", entity_service_interface_dir, entity_name_template_value_factory)
 
             self._gen_rust_file("service/impl/src/mod", entity_service_dir, entity_name_template_value_factory)
             self._gen_rust_file("service/impl/src/service", entity_service_dir, entity_name_template_value_factory)
@@ -137,14 +144,28 @@ class SchemaTemplateGenerator:
         self._gen_rust_file("db/impl/src/global_utils/client_tests/test_modules", db_test_utils_dir, global_value_factory)
         self._gen_cargo_file("db/impl", db_impl_crate.root, global_value_factory)
 
+        self._gen_rust_file("db/interface/src/lib", db_interface_crate.src, EntityModulesTemplateValueFactory(global_schema))
         self._gen_cargo_file("db/interface", db_interface_crate.root, global_value_factory)
 
         self._copy_dir("service/impl/src/global_utils", service_impl_crate.src / "utils")
         self._gen_cargo_file("service/impl", service_impl_crate.root, global_value_factory)
 
+        self._gen_rust_file("service/interface/src/lib", service_interface_crate.src, EntityModulesTemplateValueFactory(global_schema))
         self._gen_cargo_file("service/interface", service_interface_crate.root, global_value_factory)
         
         self._gen_rust_file("migration/init_migration", migration_dir, MigrationTemplateValueFactory(global_schema))
+
+        self._gen_rust_file("apps/app-base/src/app_data", app_base_crate.src, global_value_factory)
+        self._gen_rust_file("apps/app-base/src/lib", app_base_crate.src, global_value_factory)
+        self._gen_rust_file("apps/app-base/src/macros", app_base_crate.src, global_value_factory)
+        self._gen_rust_file("apps/app-base/src/main_fn", app_base_crate.src, global_value_factory)
+        self._gen_cargo_file("apps/app-base", app_base_crate.root, global_value_factory)
+
+        for app_crate in [core_app_crate, admin_app_crate]:
+            self._gen_rust_file("apps/app/src/main", app_crate.src, global_value_factory)
+            self._gen_cargo_file("apps/app", app_crate.root, global_value_factory)
+
+        self._gen_cargo_file("", self._outdir(), global_value_factory)
 
     def _make_outdir(self):
         if self._outdir().exists():

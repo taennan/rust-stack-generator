@@ -16,19 +16,17 @@ class ModelConverterTemplateValueFactory(TemplateValueFactory):
     
     @classmethod
     def service_input_converter(cls, global_schema: GlobalSchema, entity_schema: EntitySchema):
-        return ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"], object_accessor="converter.input")
+        return ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"])
 
     def __init__(
             self, 
             global_schema: GlobalSchema, 
             entity_schema: EntitySchema, 
-            ignored_fields: list[str] = [], 
-            object_accessor = "model"
+            ignored_fields: list[str] = [],
         ):
         self._global_schema = global_schema
         self._entity_schema = entity_schema
         self._ignored_fields = ignored_fields
-        self._object_accessor = object_accessor
 
     def keyvals(self) -> list[TemplateKeyValPair]:
         entity_name_factory = EntityNameTemplateValueFactory(self._global_schema, self._entity_schema.name())
@@ -39,9 +37,7 @@ class ModelConverterTemplateValueFactory(TemplateValueFactory):
     
     def _generate_mapped_fields(self) -> str:
         value = ""
-
         for field in self._entity_schema.fields():
             if not field.field_name() in self._ignored_fields:
-                value += f"\t\t\t{field.field_name()}: {self._object_accessor}.{field.field_name()},\n"
-
+                value += f"\t\t{field.field_name()},\n"
         return value.rstrip("\n")

@@ -1,0 +1,25 @@
+project: ExampleStack
+project_prefix: ES
+entities:
+  - name: User
+    fields:
+      - id: Uuid
+      - email: String
+      - password_hash: String
+      - created_at: NaiveDateTime
+      - updated_at: NaiveDateTime
+  - name: Post
+    fields:
+      - id: Uuid
+      - author_id: Uuid
+      - title: String
+      - text: Option<String>
+      - media_id: Option<String>
+      - created_at: NaiveDateTime
+      - updated_at: NaiveDateTime
+  - name: Media
+    fields:
+      - id: Uuid
+      - filename: String
+      - created_at: NaiveDateTime
+      - updated_at: NaiveDateTime

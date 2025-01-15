@@ -119,11 +119,11 @@ class SchemaTemplateGenerator:
             self._gen_rust_file(f"{service_dir}/tests", entity_service_dir, entity_name_template_value_factory)
 
             self._gen_rust_file(f"{service_utils_dir}/mod", entity_service_utils_dir, entity_name_template_value_factory)
-            self._gen_rust_file(f"{service_utils_dir}/create_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory.service_input_converter(global_schema, entity_schema))
+            self._gen_rust_file(f"{service_utils_dir}/create_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["id", "org_id", "created", "updated"]))
             self._gen_rust_file(f"{service_utils_dir}/model_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"]))
-            self._gen_rust_file(f"{service_utils_dir}/search_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory.service_input_converter(global_schema, entity_schema))
+            self._gen_rust_file(f"{service_utils_dir}/search_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"]))
             self._gen_rust_file(f"{service_utils_dir}/search_many_input_converter", entity_service_utils_dir, entity_name_template_value_factory)
-            self._gen_rust_file(f"{service_utils_dir}/update_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory.service_input_converter(global_schema, entity_schema))
+            self._gen_rust_file(f"{service_utils_dir}/update_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id", "created", "updated"]))
 
         self._gen_rust_file("api/gql/src/schema/mod", gql_endpoints_dir, GQLEndpointsModTemplateValueFactory(global_schema))
         self._gen_rust_file("api/gql/src/schema/root", gql_endpoints_dir, GQLEndpointsRootTemplateValueFactory(global_schema))

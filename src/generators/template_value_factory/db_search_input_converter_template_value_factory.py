@@ -26,7 +26,7 @@ class DBSearchInputConverterTemplateValueFactory(TemplateValueFactory):
             column_name = field.field_name_pascal()
             field_method = self._field_converter_method(field.type_name())
             if not self._is_ignored_field(field_name):
-                value += f"({field_name}, Column::{column_name}, {field_method})"
+                value += f"({field_name}, Column::{column_name}, {field_method}),\n"
 
         return value.rstrip("\n")
 

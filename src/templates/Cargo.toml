@@ -9,7 +9,6 @@ members = [
     "api/endpoints/{project_kebab}-graphql",
     "db/{project_kebab}-db-interface",
     "db/{project_kebab}-db-migrations",
-    "db/{project_kebab}-db-models",
     "db/{project_kebab}-db-postgres",
     "dev/{project_kebab}-dev-cli",
     "models/{project_kebab}-common-models",
@@ -27,11 +26,10 @@ async-graphql = { version = "7.0.13", features = ["chrono", "uuid"] }
 async-graphql-actix-web = "7.0.13"
 clap = { version = "4.5.23", features = ["derive"] }
 clap_derive = { version = "4.5.18" }
-claw-auth-client = { path = "../../Rust/claw-auth/claw-auth-client" }
 chrono = { version = "0.4.39", features = ["now", "serde"] }
 dotenv = "0.15.0"
 env_logger = "0.11.5"
-futures = "0.3.31"
+#futures = "0.3.31"
 maybe = { path = "../../Rust/maybe" }
 mockall = "0.13.0"
 tokio = { version = "1.42.0", features = ["rt", "macros"] }

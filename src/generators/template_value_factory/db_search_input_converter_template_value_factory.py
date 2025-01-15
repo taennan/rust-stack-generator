@@ -4,7 +4,6 @@ from generators.template_value_factory.template_key_val_pair import TemplateKeyV
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
 from generators.template_value_factory.entity_name_template_value_factory import EntityNameTemplateValueFactory
 from constants.rust_types import RustTypes
-from caseconverter import pascalcase, snakecase
 
 class DBSearchInputConverterTemplateValueFactory(TemplateValueFactory):
 
@@ -15,7 +14,7 @@ class DBSearchInputConverterTemplateValueFactory(TemplateValueFactory):
     def keyvals(self) -> list[TemplateKeyValPair]:
         entity_name_factory = EntityNameTemplateValueFactory(self._global_schema, self._entity_schema.name())
         return [
-            TemplateKeyValPair("mapped_methods", self._generate_mapped_fields()),
+            TemplateKeyValPair("mapped_fields", self._generate_mapped_fields()),
             *entity_name_factory.keyvals(),
         ]
     
@@ -24,15 +23,10 @@ class DBSearchInputConverterTemplateValueFactory(TemplateValueFactory):
 
         for field in self._entity_schema.fields():
             field_name = field.field_name()
+            column_name = field.field_name_pascal()
             field_method = self._field_converter_method(field.type_name())
-
-            if self._is_ignored_field(field_name):
-                continue
-
-            field_name_uppercase = pascalcase(field_name)
-            value += f"""
-            .apply_if(input.{field_name}, SearchFieldConverter::new(Column::{field_name_uppercase}).{field_method}())
-            """
+            if not self._is_ignored_field(field_name):
+                value += f"({field_name}, Column::{column_name}, {field_method})"
 
         return value.rstrip("\n")
 

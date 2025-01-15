@@ -14,5 +14,5 @@ class EntityNameTemplateValueFactory(TemplateValueFactory):
         return [
             *GlobalTemplateValueFactory(self._global_schema).keyvals(),
             TemplateKeyValPair("entity", self._entity_name),
-            TemplateKeyValPair("entity_lowercase", snakecase(self._entity_name)),
+            TemplateKeyValPair("entity_lower", snakecase(self._entity_name)),
         ]

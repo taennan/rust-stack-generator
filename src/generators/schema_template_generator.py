@@ -33,37 +33,45 @@ class SchemaTemplateGenerator:
     def make_files(self):
         global_schema = GlobalSchema(self._schema_filename)
         global_value_factory = GlobalTemplateValueFactory(global_schema)
+        entity_modules_facotry = EntityModulesTemplateValueFactory(global_schema)
+
+        project_prefix = global_schema.project_kebab()
 
         self._make_outdir()
+        self._mkdir(self._outdir() / "api")
+        self._mkdir(self._outdir() / "api/apps")
+        self._mkdir(self._outdir() / "api/endpoints")
+        self._mkdir(self._outdir() / "db")
+        self._mkdir(self._outdir() / "services")
+        self._mkdir(self._outdir() / "models")
 
-        self._mkdir(self._outdir() / "apps")
-        admin_app_crate = self._make_crate("apps/admin")
-        core_app_crate = self._make_crate("apps/core")
-        app_base_crate = self._make_crate("apps/base")
+        admin_app_crate = self._make_crate(f"api/apps/{project_prefix}-admin")
+        core_app_crate = self._make_crate(f"api/apps/{project_prefix}-core")
+        app_base_crate = self._make_crate(f"api/apps/{project_prefix}-base")
 
-        error_crate = self._make_crate("error")
-        migration_dir = self._mkdir(self._outdir() / "migration")
+        error_crate = self._make_crate(f"models/{project_prefix}-error")
+        migration_dir = self._mkdir(self._outdir() / f"db/{project_prefix}-db-migrations")
 
-        gql_crate = self._make_crate("graphql")
+        gql_crate = self._make_crate(f"api/endpoints/{project_prefix}-graphql")
         gql_context_dir = self._mkdir(gql_crate.src / "context")
         gql_endpoints_dir = self._mkdir(gql_crate.src / "schema")
 
-        common_models_crate = self._make_crate("common_models")
+        common_models_crate = self._make_crate(f"models/{project_prefix}-common-models")
+        common_models_entity_root = self._mkdir(common_models_crate.src / "entities")
 
-        db_interface_crate = self._make_crate("db_interface")
-        #db_models_crate = self._make_crate("db_models")
-        db_impl_crate = self._make_crate("db_impl")
+        db_interface_crate = self._make_crate(f"db/{project_prefix}-db-interface")
+        db_impl_crate = self._make_crate(f"db/{project_prefix}-db-postgres")
         db_utils_dir = self._mkdir(db_impl_crate.src / "utils")
         db_test_utils_dir = self._mkdir(db_utils_dir / "client_tests")
 
-        service_interface_crate = self._make_crate("service_interface")
-        service_impl_crate = self._make_crate("service_impl")
+        service_interface_crate = self._make_crate(f"services/{project_prefix}-services-interface")
+        service_impl_crate = self._make_crate(f"services/{project_prefix}-services")
 
         for entity_schema in global_schema.entities():
             entity_filename = f"{entity_schema.name_lower()}.rs"
 
             entity_db_interface_dir = self._mkdir(db_interface_crate.src / entity_schema.name_lower())
-            entity_db_dir = self._mkdir(db_impl_crate.src / entity_schema.name_lower())
+            entity_db_dir = self._mkdir(db_impl_crate.src / "clients" / entity_schema.name_lower())
             entity_db_utils_dir = self._mkdir(entity_db_dir / "utils")
             
             entity_service_interface_dir = self._mkdir(service_interface_crate.src / entity_schema.name_lower())
@@ -79,52 +87,59 @@ class SchemaTemplateGenerator:
             self._gen_bru_file("getOne", global_schema, entity_schema)
             self._gen_bru_file("update", global_schema, entity_schema)
 
-            self._gen_file("gql/src/schema/endpoint.rs", gql_endpoints_dir / entity_filename, entity_name_template_value_factory)
+            self._gen_file("api/gql/src/schema/endpoint.rs", gql_endpoints_dir / entity_filename, entity_name_template_value_factory)
+
+            self._gen_file("common_models/src/entities/entity.rs", common_models_entity_root / entity_filename, ModelTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"]))
 
             self._gen_rust_file("db/interface/src/database", entity_db_interface_dir, entity_name_template_value_factory)
             self._gen_rust_file("db/interface/src/models", entity_db_interface_dir, entity_name_template_value_factory)
             self._gen_rust_file("db/interface/src/mod", entity_db_interface_dir, entity_name_template_value_factory)
 
-            self._gen_rust_file("db/impl/src/database", entity_db_dir, entity_name_template_value_factory)
-            self._gen_rust_file("db/impl/src/entity", entity_db_dir, DBEntityTemplateValueFactory(global_schema, entity_schema))
-            self._gen_rust_file("db/impl/src/mod", entity_db_dir, entity_name_template_value_factory)
-            self._gen_rust_file("db/impl/src/tests", entity_db_dir, entity_name_template_value_factory)
+            db_client_dir = "db/impl/src/client"
+            db_client_utils_dir = f"{db_client_dir}/utils"
+            self._gen_rust_file(f"{db_client_dir}/database", entity_db_dir, entity_name_template_value_factory)
+            self._gen_rust_file(f"{db_client_dir}/entity", entity_db_dir, DBEntityTemplateValueFactory(global_schema, entity_schema))
+            self._gen_rust_file(f"{db_client_dir}/mod", entity_db_dir, entity_name_template_value_factory)
+            self._gen_rust_file(f"{db_client_dir}/tests", entity_db_dir, entity_name_template_value_factory)
 
-            self._gen_rust_file("db/impl/src/utils/create_input_converter", entity_db_utils_dir, DBCreateInputConverterTemplateValueFactory(global_schema, entity_schema))
-            self._gen_rust_file("db/impl/src/utils/model_converter", entity_db_utils_dir, ModelConverterTemplateValueFactory.db_model_converter(global_schema, entity_schema))
-            self._gen_rust_file("db/impl/src/utils/search_input_converter", entity_db_utils_dir, DBSearchInputConverterTemplateValueFactory(global_schema, entity_schema))
-            self._gen_rust_file("db/impl/src/utils/update_input_converter", entity_db_utils_dir, DBUpdateInputConverterTemplateValueFactory(global_schema, entity_schema))
-            self._gen_rust_file("db/impl/src/utils/mod", entity_db_utils_dir, entity_name_template_value_factory)
+            self._gen_rust_file(f"{db_client_utils_dir}/create_input_converter", entity_db_utils_dir, DBCreateInputConverterTemplateValueFactory(global_schema, entity_schema))
+            self._gen_rust_file(f"{db_client_utils_dir}/model_converter", entity_db_utils_dir, ModelConverterTemplateValueFactory.db_model_converter(global_schema, entity_schema))
+            self._gen_rust_file(f"{db_client_utils_dir}/search_input_converter", entity_db_utils_dir, DBSearchInputConverterTemplateValueFactory(global_schema, entity_schema))
+            self._gen_rust_file(f"{db_client_utils_dir}/update_input_converter", entity_db_utils_dir, DBUpdateInputConverterTemplateValueFactory(global_schema, entity_schema))
+            self._gen_rust_file(f"{db_client_utils_dir}/mod", entity_db_utils_dir, entity_name_template_value_factory)
 
             self._gen_rust_file("service/interface/src/mod", entity_service_interface_dir, entity_name_template_value_factory)
             self._gen_rust_file("service/interface/src/models", entity_service_interface_dir, entity_name_template_value_factory)
             self._gen_rust_file("service/interface/src/service", entity_service_interface_dir, entity_name_template_value_factory)
 
-            self._gen_rust_file("service/impl/src/mod", entity_service_dir, entity_name_template_value_factory)
-            self._gen_rust_file("service/impl/src/service", entity_service_dir, entity_name_template_value_factory)
-            self._gen_rust_file("service/impl/src/tests", entity_service_dir, entity_name_template_value_factory)
+            service_dir = "service/impl/src/service"
+            service_utils_dir = f"{service_dir}/utils"
+            self._gen_rust_file(f"{service_dir}/mod", entity_service_dir, entity_name_template_value_factory)
+            self._gen_rust_file(f"{service_dir}/service", entity_service_dir, entity_name_template_value_factory)
+            self._gen_rust_file(f"{service_dir}/tests", entity_service_dir, entity_name_template_value_factory)
 
-            self._gen_rust_file("service/impl/src/utils/mod", entity_service_utils_dir, entity_name_template_value_factory)
-            self._gen_rust_file("service/impl/src/utils/create_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory.service_input_converter(global_schema, entity_schema))
-            self._gen_rust_file("service/impl/src/utils/model_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"]))
-            self._gen_rust_file("service/impl/src/utils/search_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory.service_input_converter(global_schema, entity_schema))
-            self._gen_rust_file("service/impl/src/utils/search_many_input_converter", entity_service_utils_dir, entity_name_template_value_factory)
-            self._gen_rust_file("service/impl/src/utils/update_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory.service_input_converter(global_schema, entity_schema))
+            self._gen_rust_file(f"{service_utils_dir}/mod", entity_service_utils_dir, entity_name_template_value_factory)
+            self._gen_rust_file(f"{service_utils_dir}/create_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory.service_input_converter(global_schema, entity_schema))
+            self._gen_rust_file(f"{service_utils_dir}/model_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"]))
+            self._gen_rust_file(f"{service_utils_dir}/search_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory.service_input_converter(global_schema, entity_schema))
+            self._gen_rust_file(f"{service_utils_dir}/search_many_input_converter", entity_service_utils_dir, entity_name_template_value_factory)
+            self._gen_rust_file(f"{service_utils_dir}/update_input_converter", entity_service_utils_dir, ModelConverterTemplateValueFactory.service_input_converter(global_schema, entity_schema))
 
-        self._gen_rust_file("gql/src/schema/mod", gql_endpoints_dir, GQLEndpointsModTemplateValueFactory(global_schema))
-        self._gen_rust_file("gql/src/schema/root", gql_endpoints_dir, GQLEndpointsRootTemplateValueFactory(global_schema))
-        self._gen_rust_file("gql/src/context/context_wrapper", gql_context_dir, GQLContextTemplateValueFactory(global_schema))
-        self._gen_rust_file("gql/src/context/db_factory", gql_context_dir, GQLDBTemplateValueFactory(global_schema))
-        self._gen_rust_file("gql/src/context/app_data", gql_context_dir, global_value_factory)
-        self._gen_rust_file("gql/src/context/mod", gql_context_dir, global_value_factory)
-        self._gen_rust_file("gql/src/routes", gql_crate.src, global_value_factory)
-        self._gen_rust_file("gql/src/lib", gql_crate.src, global_value_factory)
-        self._gen_cargo_file("gql", gql_crate.root, global_value_factory)
+        self._gen_rust_file("api/gql/src/schema/mod", gql_endpoints_dir, GQLEndpointsModTemplateValueFactory(global_schema))
+        self._gen_rust_file("api/gql/src/schema/root", gql_endpoints_dir, GQLEndpointsRootTemplateValueFactory(global_schema))
+        self._gen_rust_file("api/gql/src/context/context_wrapper", gql_context_dir, GQLContextTemplateValueFactory(global_schema))
+        self._gen_rust_file("api/gql/src/context/db_factory", gql_context_dir, GQLDBTemplateValueFactory(global_schema))
+        self._gen_rust_file("api/gql/src/context/app_data", gql_context_dir, global_value_factory)
+        self._gen_rust_file("api/gql/src/context/mod", gql_context_dir, global_value_factory)
+        self._gen_rust_file("api/gql/src/routes", gql_crate.src, global_value_factory)
+        self._gen_rust_file("api/gql/src/lib", gql_crate.src, global_value_factory)
+        self._gen_cargo_file("api/gql", gql_crate.root, global_value_factory)
 
         self._gen_rust_file("common_models/src/create", common_models_crate.src, global_value_factory)
         self._gen_rust_file("common_models/src/delete", common_models_crate.src, global_value_factory)
         self._gen_rust_file("common_models/src/update", common_models_crate.src, global_value_factory)
         self._copy_dir("common_models/src/search", common_models_crate.src / "search")
+        self._gen_rust_file("common_models/src/entities/mod", common_models_entity_root, entity_modules_facotry)
         self._gen_cargo_file("common_models", common_models_crate.root, global_value_factory)
 
         self._gen_rust_file("error/src/actix_web_integration", error_crate.src, global_value_factory)
@@ -135,35 +150,39 @@ class SchemaTemplateGenerator:
         self._gen_rust_file("error/src/lib", error_crate.src, global_value_factory)
         self._gen_cargo_file("error", error_crate.root, global_value_factory)
 
-        self._gen_rust_file("db/impl/src/global_utils/mod", db_utils_dir, global_value_factory)
-        self._gen_rust_file("db/impl/src/global_utils/client_impl", db_utils_dir, global_value_factory)
-        self._gen_rust_file("db/impl/src/global_utils/database_connector", db_utils_dir, global_value_factory)
-        self._gen_rust_file("db/impl/src/global_utils/search_field_converter", db_utils_dir, global_value_factory)
-        self._gen_rust_file("db/impl/src/global_utils/client_tests/mod", db_test_utils_dir, global_value_factory)
-        self._gen_rust_file("db/impl/src/global_utils/client_tests/mock_connection", db_test_utils_dir, global_value_factory)
-        self._gen_rust_file("db/impl/src/global_utils/client_tests/test_modules", db_test_utils_dir, global_value_factory)
+        db_global_utils_dir = "db/impl/src/utils"
+        self._gen_rust_file(f"db/impl/src/lib", db_impl_crate.src, global_value_factory)
+        self._gen_file("db/impl/src/clients_mod.rs", db_impl_crate.src / "clients/mod.rs", entity_modules_facotry)
+        self._gen_rust_file(f"{db_global_utils_dir}/mod", db_utils_dir, global_value_factory)
+        self._gen_rust_file(f"{db_global_utils_dir}/client_impl", db_utils_dir, global_value_factory)
+        self._gen_rust_file(f"{db_global_utils_dir}/database_connector", db_utils_dir, global_value_factory)
+        self._gen_rust_file(f"{db_global_utils_dir}/search_field_converter", db_utils_dir, global_value_factory)
+        self._gen_rust_file(f"{db_global_utils_dir}/test_utils/mod", db_test_utils_dir, global_value_factory)
+        self._gen_rust_file(f"{db_global_utils_dir}/test_utils/mock_connection", db_test_utils_dir, global_value_factory)
+        self._gen_rust_file(f"{db_global_utils_dir}/test_utils/test_macros", db_test_utils_dir, global_value_factory)
         self._gen_cargo_file("db/impl", db_impl_crate.root, global_value_factory)
 
-        self._gen_rust_file("db/interface/src/lib", db_interface_crate.src, EntityModulesTemplateValueFactory(global_schema))
+        self._gen_rust_file("db/interface/src/lib", db_interface_crate.src, entity_modules_facotry)
         self._gen_cargo_file("db/interface", db_interface_crate.root, global_value_factory)
 
-        self._copy_dir("service/impl/src/global_utils", service_impl_crate.src / "utils")
+        self._gen_rust_file("service/impl/src/lib", service_impl_crate.src, entity_modules_facotry)
+        self._copy_dir("service/impl/src/utils", service_impl_crate.src / "utils")
         self._gen_cargo_file("service/impl", service_impl_crate.root, global_value_factory)
 
-        self._gen_rust_file("service/interface/src/lib", service_interface_crate.src, EntityModulesTemplateValueFactory(global_schema))
+        self._gen_rust_file("service/interface/src/lib", service_interface_crate.src, entity_modules_facotry)
         self._gen_cargo_file("service/interface", service_interface_crate.root, global_value_factory)
         
         self._gen_rust_file("migration/init_migration", migration_dir, MigrationTemplateValueFactory(global_schema))
 
-        self._gen_rust_file("apps/app-base/src/app_data", app_base_crate.src, global_value_factory)
-        self._gen_rust_file("apps/app-base/src/lib", app_base_crate.src, global_value_factory)
-        self._gen_rust_file("apps/app-base/src/macros", app_base_crate.src, global_value_factory)
-        self._gen_rust_file("apps/app-base/src/main_fn", app_base_crate.src, global_value_factory)
-        self._gen_cargo_file("apps/app-base", app_base_crate.root, global_value_factory)
+        self._gen_rust_file("api/app-base/src/app_data", app_base_crate.src, global_value_factory)
+        self._gen_rust_file("api/app-base/src/lib", app_base_crate.src, global_value_factory)
+        self._gen_rust_file("api/app-base/src/macros", app_base_crate.src, global_value_factory)
+        self._gen_rust_file("api/app-base/src/main_fn", app_base_crate.src, global_value_factory)
+        self._gen_cargo_file("api/app-base", app_base_crate.root, global_value_factory)
 
         for app_crate in [core_app_crate, admin_app_crate]:
-            self._gen_rust_file("apps/app/src/main", app_crate.src, global_value_factory)
-            self._gen_cargo_file("apps/app", app_crate.root, global_value_factory)
+            self._gen_rust_file("api/app/src/main", app_crate.src, global_value_factory)
+            self._gen_cargo_file("api/app", app_crate.root, global_value_factory)
 
         self._gen_cargo_file("", self._outdir(), global_value_factory)
 
@@ -176,7 +195,7 @@ class SchemaTemplateGenerator:
         return Path.cwd() / f"src/generated/{self._schema_filename}"
 
     def _mkdir(self, path: Path) -> Path:
-        path.mkdir(exist_ok=True)
+        path.mkdir(parents=True, exist_ok=True)
         return path
     
     def _make_crate(self, path: str) -> CrateDirectories:

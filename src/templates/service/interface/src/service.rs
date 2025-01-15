@@ -1,6 +1,6 @@
 use crate::{
     common::DeleteOutput,
-    {entity_lowercase}::{
+    {entity_lower}::{
         Create{entity}Input, {entity}, SearchMany{entity}sInput, Search{entity}Input,
         Update{entity}Input,
     },

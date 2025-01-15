@@ -37,7 +37,8 @@ class ModelTemplateValueFactory(TemplateValueFactory):
             "create_input_fields",
             lambda field: (
                 not self._is_ignored_mutation_field(field.field_name()) and
-                not self._is_ignored_field(field.field_name())
+                not self._is_ignored_field(field.field_name()) and
+                field.field_name() != "id"
             ),
             lambda field: field.type_name()
         )

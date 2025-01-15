@@ -17,6 +17,10 @@ class RustTypes:
         return False
     
     @staticmethod
+    def is_optional(type_name: str) -> bool:
+        return type_name.startswith("Option<") and type_name.endswith(">")
+    
+    @staticmethod
     def is_type_or_optional(type_name: str, compared_type: str) -> bool:
         return type_name == compared_type or type_name == f"Option<{compared_type}>"
 

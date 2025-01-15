@@ -82,7 +82,7 @@ entities:
       file_id: Uuid
       title: String
       # MediaType { IMAGE, VIDEO, AUDIO }
-      type: String
+      variant: String
       filename: String
       description: String
       created: NaiveDateTime

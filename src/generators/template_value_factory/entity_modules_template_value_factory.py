@@ -10,6 +10,7 @@ class EntityModulesTemplateValueFactory(TemplateValueFactory):
     def keyvals(self) -> list[TemplateKeyValPair]:
         return [
             TemplateKeyValPair("modules", self._gen_modules()),
+            TemplateKeyValPair("public_uses", self._gen_public_uses())
         ]
 
     def _gen_modules(self) -> str:
@@ -17,3 +18,9 @@ class EntityModulesTemplateValueFactory(TemplateValueFactory):
         for entity_schema in self._global_schema.entities():
             modules += f"pub mod {entity_schema.name_lower()};\n"
         return modules
+    
+    def _gen_public_uses(self) -> str:
+        uses = ""
+        for entity_schema in self._global_schema.entities():
+            uses += f"pub use {entity_schema.name_lower()}::*;\n"
+        return uses

@@ -10,8 +10,6 @@ use {project_lower}_error::{project_prefix}Result;
 use mockall::automock;
 use uuid::Uuid;
 
-pub type {entity}ServiceTrait = dyn {entity}Service;
-
 #[automock]
 #[async_trait]
 pub trait {entity}Service {

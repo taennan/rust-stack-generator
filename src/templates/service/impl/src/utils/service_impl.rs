@@ -1,8 +1,8 @@
 macro_rules! simple_create_impl {
     ($this:ident, $db:ident, $input:ident, $model_converter:ident, $converter:ident) => {{
         let input_converter = $converter::new($input, $this.org_id);
-        let model = $this.$db.create(converter.into()).await?;
-        let model_converter = $model_converter::from(model)
+        let model = $this.$db.create(input_converter.into()).await?;
+        let model_converter = $model_converter::from(model);
         Ok(model_converter.into())
     }};
 }
@@ -27,7 +27,7 @@ macro_rules! simple_get_one_impl {
     ($this:ident, $db:ident, $input:ident, $model_converter:ident, $input_converter:ident) => {{
         let input_converter = $input_converter::new($input, $this.org_id);
         let model = $this.$db.get_one(input_converter.into()).await?;
-        let model_converter = $model_converter::from(model)
+        let model_converter = $model_converter::from(model);
         Ok(model_converter.into())
     }};
 }
@@ -65,7 +65,7 @@ macro_rules! simple_delete_by_id_impl {
             let error_message = format!("No model with id '{}' found", $id);
             Err({project_lower}_error::{project_prefix}Error::NotFound(error_message))
         } else {
-            let output = {project_lower}_services_interface::common::DeleteOutput::from(amount_deleted);
+            let output = {project_lower}_common_models::delete::DeleteOutput::from(amount_deleted);
             Ok(output)
         }
     }};

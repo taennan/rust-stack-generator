@@ -1,6 +1,6 @@
 use crate::{
-    occupant::{
-        {entity_lower}::{ActiveModel, Column, Entity},
+    {entity_lower}::{
+        entity::{ActiveModel, Column, Entity},
         utils::{
             Create{entity}InputConverter, Search{entity}InputConverter,
             Update{entity}InputConverter,
@@ -8,8 +8,8 @@ use crate::{
     },
     utils::client_impl,
 };
-pub use {project_lower}_db_interface::{entity}DBTrait;
-use {project_lower}_db_models::{entity_lower}::{
+pub use {project_lower}_db_interface::{entity_lower}::{entity}DB as {entity}DBTrait;
+use {project_lower}_db_interface::{entity_lower}::{
     Create{entity}Input, {entity}, SearchMany{entity}sInput, Search{entity}Input,
     Update{entity}Input,
 };

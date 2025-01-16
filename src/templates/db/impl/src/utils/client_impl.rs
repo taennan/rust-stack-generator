@@ -59,9 +59,9 @@ macro_rules! count_impl {
         let count = Select::<Entity>::from(converter)
             .count(&$this.connection)
             .await
-            .map_err(dockit_error::DockitError::from)?;
+            .map_err({project_lower}_error::DockitError::from)?;
 
-        Ok(dockit_common_models::search::CountOutput::from(count))
+        Ok({project_lower}_common_models::search::CountOutput::from(count))
     }};
 }
 

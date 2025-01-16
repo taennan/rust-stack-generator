@@ -14,7 +14,11 @@ service_tests::simple_create_tests!(
     Create{entity}Input
 );
 
-service_tests::simple_get_by_id_tests!({entity}Service, Mock{entity}DB, {entity});
+service_tests::simple_get_by_id_tests!(
+    {entity}Service, 
+    [(), Mock{entity}DB], 
+    {entity}
+);
 
 service_tests::simple_get_one_tests!(
     {entity}Service,
@@ -30,4 +34,7 @@ service_tests::simple_update_tests!(
     Update{entity}Input
 );
 
-service_tests::simple_delete_by_id_tests!({entity}Service, Mock{entity}DB);
+service_tests::simple_delete_by_id_tests!(
+    {entity}Service, 
+    [(), Mock{entity}DB]
+);

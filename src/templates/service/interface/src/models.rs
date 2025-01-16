@@ -5,7 +5,6 @@ use {project_lower}_common_models::{
     update_{entity_lower}_input,
     search_many_input,
 };
-use uuid::Uuid;
 
 {entity_lower}_model! {}
 

@@ -182,9 +182,13 @@ class SchemaTemplateGenerator:
         self._gen_rust_file("db/interface/src/lib", db_interface_crate.src, entity_modules_factory)
         self._gen_cargo_file("db/interface", db_interface_crate.root, global_value_factory)
 
+        service_global_utils_dir = self._mkdir(service_impl_crate.src / "utils")
         self._gen_rust_file("service/impl/src/lib", service_impl_crate.src, entity_modules_factory)
         self._gen_file("service/impl/src/services_mod.rs", service_impl_crate.src / "services/mod.rs", entity_modules_factory)
-        self._copy_dir("service/impl/src/utils", service_impl_crate.src / "utils")
+        self._gen_rust_file("service/impl/src/utils/input_converters", service_global_utils_dir, global_value_factory)
+        self._gen_rust_file("service/impl/src/utils/mod", service_global_utils_dir, global_value_factory)
+        self._gen_rust_file("service/impl/src/utils/service_impl", service_global_utils_dir, global_value_factory)
+        self._gen_rust_file("service/impl/src/utils/service_tests", service_global_utils_dir, global_value_factory)
         self._gen_cargo_file("service/impl", service_impl_crate.root, global_value_factory)
 
         self._gen_rust_file("service/interface/src/lib", service_interface_crate.src, entity_modules_factory)

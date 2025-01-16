@@ -83,7 +83,7 @@ macro_rules! search_input_converter {
         impl From<$struct_name> for $to_struct {
             fn from(converter: $struct_name) -> Self {
                 Self {
-                    org_id: Some(dockit_common_models::search::SearchIdInput::Equals(
+                    org_id: Some({project_lower}_common_models::search::SearchIdInput::Equals(
                         converter.org_id,
                     )),
                     $($mapped_field: converter.input.$mapped_field,)*

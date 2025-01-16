@@ -30,7 +30,7 @@ class DBEntityTemplateValueFactory(TemplateValueFactory):
             if field_macro:
                 value += f"\t{field_macro}\n"
 
-            value += f"\t{field.field_name()}: {field_type},\n"
+            value += f"\tpub {field.field_name()}: {field_type},\n"
 
         return value.rstrip("\n")
     

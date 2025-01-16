@@ -7,9 +7,9 @@ use crate::{
     utils::service_impl,
 };
 use async_trait::async_trait;
-use {project_lower}_db_interface::{entity}DB;
+use {project_lower}_db_interface::{entity_lower}::{entity}DB;
 use {project_lower}_error::{project_prefix}Result;
-pub use {project_lower}_services_interface::{entity_lower}::{entity}ServiceTrait;
+pub use {project_lower}_services_interface::{entity_lower}::{entity}Service as {entity}ServiceTrait;
 use {project_lower}_common_models::{delete::DeleteOutput, search::CountOutput};
 use {project_lower}_services_interface::{entity_lower}::{
     Create{entity}Input, {entity}, SearchMany{entity}sInput, Search{entity}Input,

@@ -7,7 +7,7 @@ edition = "2021"
 actix-web = { workspace = true }
 async-graphql = { workspace = true }
 async-graphql-actix-web = { workspace = true }
-{project_kebab}-debug-graphql = { path = "../{project_kebab}-debug-graphql" }
+{project_kebab}-common-models = { path = "../../../models/{project_kebab}-common-models" }
 {project_kebab}-services = { path = "../../../services/{project_kebab}-services" }
 {project_kebab}-services-interface = { path = "../../../services/{project_kebab}-services-interface", features = [
     "async_graphql",

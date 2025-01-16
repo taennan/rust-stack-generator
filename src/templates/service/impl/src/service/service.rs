@@ -10,7 +10,7 @@ use async_trait::async_trait;
 use {project_lower}_db_interface::{entity}DB;
 use {project_lower}_error::{project_prefix}Result;
 pub use {project_lower}_services_interface::{entity_lower}::{entity}ServiceTrait;
-use {project_lower}_common_models::delete::DeleteOutput;
+use {project_lower}_common_models::{delete::DeleteOutput, search::CountOutput};
 use {project_lower}_services_interface::{entity_lower}::{
     Create{entity}Input, {entity}, SearchMany{entity}sInput, Search{entity}Input,
     Update{entity}Input,
@@ -67,6 +67,15 @@ where
             input,
             {entity}Converter,
             SearchMany{entity}sInputConverter
+        )
+    }
+
+    async fn count(&self, input: Search{entity}Input) -> {project_prefix}Result<CountOutput> {
+        service_impl::simple_count_impl!(
+            self, 
+            {entity_lower}_db, 
+            input,
+            Search{entity}InputConverter
         )
     }
 

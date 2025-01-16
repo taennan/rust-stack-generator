@@ -41,6 +41,14 @@ macro_rules! simple_get_many_impl {
     }};
 }
 
+macro_rules! simple_count_impl {
+    ($this:ident, $db:ident, $input:ident, $input_converter:ident) => {{
+        let input_converter = $input_converter::new($input, $this.org_id);
+        let result = $this.$db.get_count(input_converter.into()).await?;
+        Ok(result)
+    }};
+}
+
 macro_rules! simple_update_impl {
     ($this:ident, $db:ident, $model_converter:ident, $input_converter:ident) => {{
         let input_converter = $input_converter::new($input, $this.org_id);
@@ -67,5 +75,6 @@ pub(crate) use simple_create_impl;
 pub(crate) use simple_delete_by_id_impl;
 pub(crate) use simple_get_by_id_impl;
 pub(crate) use simple_get_many_impl;
+pub(crate) use simple_count_impl;
 pub(crate) use simple_get_one_impl;
 pub(crate) use simple_update_impl;

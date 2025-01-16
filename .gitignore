@@ -5,5 +5,3 @@ lib
 .pyvenv.cfg
 .DS_Store
 __pycache__
-
-generated/*

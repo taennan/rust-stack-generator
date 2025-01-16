@@ -11,7 +11,7 @@ use async_trait::async_trait;
 use mockall::automock;
 use uuid::Uuid;
 
-pub type {entity}DBTrait = {entity}DB;
+pub type {entity}DBTrait = dyn {entity}DB;
 
 #[automock]
 #[async_trait]

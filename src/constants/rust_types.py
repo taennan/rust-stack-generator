@@ -1,9 +1,14 @@
 class RustTypes:
     STRING = "String"
     UUID = "Uuid"
+    U8 = "u8"
+    U16 = "u16"
+    U32 = "u32"
+    NAIVE_DATE_TIME = "NaiveDateTime"
+    DATE_TIME = "DateTime"
 
-    _NUMBER_TYPES = ["usize", "isize", "u8", "u16", "u32", "u64", "i8", "i16", "i32", "i64"]
-    _TIME_TYPES = ["NaiveDateTime", "DateTime"]
+    _NUMBER_TYPES = ["usize", "isize", U8, U16, U32, "u64", "i8", "i16", "i32", "i64"]
+    _TIME_TYPES = [NAIVE_DATE_TIME, DATE_TIME]
     _ITERABLE_TYPES = [STRING]
 
     _EXACT_TYPES = ["Uuid"]

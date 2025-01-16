@@ -4,6 +4,6 @@ use {project_lower}_db_interface::{entity_lower}::{entity};
 struct_from_mapper!(
     Model => {entity},
     {
-        {model_fields}
+        {mapped_fields}
     }
 );

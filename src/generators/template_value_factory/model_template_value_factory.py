@@ -1,6 +1,7 @@
 from generators.template_value_factory.template_key_val_pair import TemplateKeyValPair
 from generators.template_value_factory.template_value_factory import TemplateValueFactory
 from generators.template_value_factory.entity_name_template_value_factory import EntityNameTemplateValueFactory
+from generators.template_value_factory.global_template_value_factory import GlobalTemplateValueFactory
 from generators.schema.global_schema import GlobalSchema
 from generators.schema.entity_schema import EntitySchema, EntityField
 from constants.rust_types import RustTypes
@@ -56,8 +57,7 @@ class ModelTemplateValueFactory(TemplateValueFactory):
 
     def _search_input_fields(self) -> TemplateKeyValPair:
         def generate_field_type(field: EntityField) -> str:
-            operator_type = self._search_operator_from_type(field.type_name())
-            return f"Option<{operator_type}<{field.type_name()}>>"
+            return f"Option<{self._search_input_from_type(field.type_name())}>"
 
         return self._generate_input_fields(
             "search_input_fields",
@@ -94,12 +94,18 @@ class ModelTemplateValueFactory(TemplateValueFactory):
     def _is_ignored_mutation_field(self, field_name: str) -> bool:
             return field_name in ["created", "updated"]
 
-    def _search_operator_from_type(self, field_type: str) -> str:
-        if RustTypes.is_exact_type(field_type):
-            return "SearchExactOperator"
-        if RustTypes.is_ranged_type(field_type):
-            return "SearchRangedOperator"
-        if RustTypes.is_iterable_type(field_type):
-            return "SearchIterableOperator"
-
+    def _search_input_from_type(self, field_type: str) -> str:
+        return f"{self._global_schema.project_lower()}_common_models::search::{self._raw_search_input_from_type(field_type)}"
+    
+    def _raw_search_input_from_type(self, field_type: str) -> str:
+        if RustTypes.is_type_or_optional(field_type, RustTypes.UUID):
+            return "SearchIdInput"
+        if RustTypes.is_type_or_optional(field_type, RustTypes.STRING):
+            return "SearchStringInput"
+        if RustTypes.is_type_or_optional(field_type, RustTypes.U32):
+            return "SearchUIntInput"
+        if RustTypes.is_type_or_optional(field_type, RustTypes.NAIVE_DATE_TIME):
+            return "SearchDateTimeInput"
+        
         raise Exception(f"Unknown field_type '{field_type}'")
+

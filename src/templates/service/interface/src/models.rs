@@ -3,8 +3,7 @@ use {project_lower}_common_models::{
     create_{entity_lower}_input, 
     search_{entity_lower}_input,
     update_{entity_lower}_input,
-    search_many_input, 
-    search::SearchIdInput, 
+    search_many_input,
 };
 use uuid::Uuid;
 

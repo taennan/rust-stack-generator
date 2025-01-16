@@ -3,7 +3,7 @@ macro_rules! struct_mapper {
         $struct_name:ident,
         $from_struct:ty => $to_struct:ty,
         {
-            $($mapped_field:ident),+
+            $($mapped_field:ident),+$(,)?
         }
     ) => {
         pub(crate) struct $struct_name($from_struct);
@@ -36,7 +36,7 @@ macro_rules! create_input_converter {
         $struct_name:ident,
         $from_struct:ty => $to_struct:ty,
         {
-            $($mapped_field:ident),+
+            $($mapped_field:ident),+$(,)?
         }
     ) => {
         pub(crate) struct $struct_name {
@@ -66,7 +66,7 @@ macro_rules! search_input_converter {
         $struct_name:ident,
         $from_struct:ty => $to_struct:ty,
         {
-            $($mapped_field:ident),+
+            $($mapped_field:ident),+$(,)?
         }
     ) => {
         pub(crate) struct $struct_name {

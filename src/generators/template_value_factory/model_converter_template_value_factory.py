@@ -6,18 +6,6 @@ from generators.template_value_factory.entity_name_template_value_factory import
 
 class ModelConverterTemplateValueFactory(TemplateValueFactory):
 
-    @classmethod
-    def db_model_converter(cls, global_schema: GlobalSchema, entity_schema: EntitySchema):
-        return ModelConverterTemplateValueFactory(global_schema, entity_schema)
-    
-    @classmethod
-    def service_model_converter(cls, global_schema: GlobalSchema, entity_schema: EntitySchema):
-        return ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"])
-    
-    @classmethod
-    def service_input_converter(cls, global_schema: GlobalSchema, entity_schema: EntitySchema):
-        return ModelConverterTemplateValueFactory(global_schema, entity_schema, ignored_fields=["org_id"])
-
     def __init__(
             self, 
             global_schema: GlobalSchema, 
